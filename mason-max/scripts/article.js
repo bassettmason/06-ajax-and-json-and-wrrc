@@ -1,6 +1,6 @@
 'use strict';
 
-function Article (rawDataObj) {
+function Article(rawDataObj) {
   this.author = rawDataObj.author;
   this.authorUrl = rawDataObj.authorUrl;
   this.title = rawDataObj.title;
@@ -14,10 +14,10 @@ Article.all = [];
 
 // XCOMMENT: Why isn't this method written as an arrow function?
 // Because it would have the wrong contextual this in it.
-Article.prototype.toHtml = function() {
+Article.prototype.toHtml = function () {
   let template = Handlebars.compile($('#article-template').text());
 
-  this.daysAgo = parseInt((new Date() - new Date(this.publishedOn))/60/60/24/1000);
+  this.daysAgo = parseInt((new Date() - new Date(this.publishedOn)) / 60 / 60 / 24 / 1000);
 
   // xCOMMENT: What is going on in the line below? What do the question mark and colon represent? How have we seen this same logic represented previously?
   // Not sure? Check the docs!
@@ -35,7 +35,7 @@ Article.prototype.toHtml = function() {
 // xCOMMENT: Where is this function called? What does 'rawData' represent now? How is this different from previous labs?
 // The rawdata now represent an object through the constructer Article
 Article.loadAll = articleData => {
-  articleData.sort((a,b) => (new Date(b.publishedOn)) - (new Date(a.publishedOn)))
+  articleData.sort((a, b) => (new Date(b.publishedOn)) - (new Date(a.publishedOn)))
 
   articleData.forEach(articleObject => Article.all.push(new Article(articleObject)))
 }
@@ -46,23 +46,17 @@ Article.fetchAll = () => {
   //the if statement checks the localstorage for data then if it is empty the else statement checks the "database" for data
   if (localStorage.rawData) {
 
-    Article.loadAll();
+    Article.loadAll(JSON.parse(localStorage.rawData));
+    articleView.initIndexPage();
 
   } else {
-    $.getJSON("../data/hackerIpsum.json")
-    .then(function(data) {
-    Article.loadAll(data)
-    localStorage.setItem('rawData', JSON.stringify(data))
-    })
-   
-    // (data => articleView.initIndexPage())
-    
-    
-    
-    .catch( err => console.error("we suck", err));
+    $.getJSON('../data/hackerIpsum.json')
+      .then(function (data) {
+        Article.loadAll(data);
+        localStorage.setItem('rawData', JSON.stringify(data));
+        articleView.initIndexPage();
+      })
+      .catch(err => console.error('we suck', err));
   }
 }
-Article.loadAll();
-Article.fetchAll();
 
-console.log(Article.all);
